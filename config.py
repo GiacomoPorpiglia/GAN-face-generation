@@ -6,4 +6,8 @@ num_channels = 3
 output_size = 64
 input_size = 64
 lr = 2e-4
+
+size = 'small'
+
+
 device = "cuda" if torch.cuda.is_available() else "cpu"

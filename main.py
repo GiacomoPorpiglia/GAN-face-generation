@@ -7,7 +7,7 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from dataset import ZipImageDataset
+from dataset import ImageFolderDataset
 import config
 from GAN import Generator, Discriminator
 from tqdm import tqdm
@@ -15,6 +15,8 @@ import torchvision.utils as vutils
 
 checkpoint_path_gen = "./checkpoint_gen.pth.tar"
 checkpoint_path_disc = "./checkpoint_disc.pth.tar"
+
+print(config.device)
 
 def save_checkpoint(checkpoint, filename):
     print("=> saving checkpoint...")
@@ -46,12 +48,12 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,), (0.5,))  # Normalize to [-1, 1]
 ])
 
-zip_path = "faces.zip"
-imgDataset = ZipImageDataset(zip_path, transform=transform)
-dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True)
+folder_path = "Humans/"
+imgDataset = ImageFolderDataset(folder_path, transform=transform)
+dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, num_workers=16, persistent_workers=True, pin_memory=True)
 
-generator = Generator('small').to(config.device)
-discriminator = Discriminator('small').to(config.device)
+generator = Generator(config.size).to(config.device)
+discriminator = Discriminator(config.size).to(config.device)
 
 opt_generator = optim.Adam(generator.parameters(), lr=config.lr)
 opt_discriminator = optim.Adam(discriminator.parameters(), lr=config.lr)
@@ -62,8 +64,6 @@ criterion = nn.BCELoss()
 
 def train(dataloader, generator, discriminator, start_epoch = 0, num_epochs=20):
 
-
-
     for epoch in range(start_epoch, num_epochs):
         generator.train()
         discriminator.train()
@@ -72,7 +72,7 @@ def train(dataloader, generator, discriminator, start_epoch = 0, num_epochs=20):
         batch_cnt = 0
         for batch_idx, real in enumerate(tqdm(dataloader)):
 
-            real = real.to(config.device)
+            real = real.to(config.device, non_blocking=True)
 
             input_noise = torch.randn(config.batch_size, config.num_channels, config.noise_size, config.noise_size, device=config.device)
             fake = generator(input_noise)
@@ -148,11 +148,5 @@ if __name__ == "__main__":
     if os.path.exists(checkpoint_path_disc):
         load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
 
-    train(dataloader, generator, discriminator, start_epoch=6, num_epochs=20)
+    train(dataloader, generator, discriminator, start_epoch=50, num_epochs=150)
     
-
-
-
-
-
-
