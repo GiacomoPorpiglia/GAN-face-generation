@@ -95,10 +95,10 @@ class Discriminator(nn.Module):
             nn.MaxPool2d(kernel_size=2),  # [B, expansion3, 8, 8]
             nn.LeakyReLU(inplace=True),
 
-            nn.Flatten(start_dim=1), # [B, 128*16*16]
-            nn.Linear(self.expansion3*8*8, self.expansion4*8*8),
+            nn.Flatten(start_dim=1), # [B, expansion3 * 8 * 8]
+            nn.Linear(self.expansion3 * 8 * 8, self.expansion4 * 8 * 8),
             nn.LeakyReLU(inplace=True),
-            nn.Linear(self.expansion4*8*8, 1),
+            nn.Linear(self.expansion4 * 8 * 8, 1),
             nn.Sigmoid()
         )
     
