@@ -69,10 +69,12 @@ class Discriminator(nn.Module):
             self.expansion1 = 48
             self.expansion2 = 32
             self.expansion3 = 16
+            self.expansion4 = 16
         elif size == 'medium':
             self.expansion1 = 128
             self.expansion2 = 64
             self.expansion3 = 32
+            self.expansion4 = 16
         elif size == 'big':
             self.expansion1 = 256
             self.expansion2 = 128
