@@ -3,3 +3,8 @@ generated_images
 __pycache__
 key
 generated_images1
+*.jpg
+*.png
+*.jpeg
+key
+*.tar

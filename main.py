@@ -48,9 +48,9 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,), (0.5,))  # Normalize to [-1, 1]
 ])
 
-folder_path = "Humans/"
+folder_path = "faces/Humans/"
 imgDataset = ImageFolderDataset(folder_path, transform=transform)
-dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, num_workers=16, persistent_workers=True, pin_memory=True)
+dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, num_workers=12, persistent_workers=True, pin_memory=True)
 
 generator = Generator('small').to(config.device)
 discriminator = Discriminator('small').to(config.device)
@@ -148,5 +148,5 @@ if __name__ == "__main__":
     if os.path.exists(checkpoint_path_disc):
         load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
     test_noise = torch.randn(16, config.num_channels, config.noise_size, config.noise_size, device=config.device)
-    train(dataloader, generator, discriminator, test_noise, start_epoch=50, num_epochs=150)
+    train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=150)
     
