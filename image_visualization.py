@@ -37,5 +37,5 @@ def display_image_sequence(folder_path, delay=1):
 
 # Example usage
 if __name__ == "__main__":
-    folder_path = "generated_images1"  # Change this to your folder path
-    display_image_sequence(folder_path, delay=0.1)
+    folder_path = "generated_images"  # Change this to your folder path
+    display_image_sequence(folder_path, delay=0.05)
