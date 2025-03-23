@@ -147,6 +147,6 @@ if __name__ == "__main__":
         
     if os.path.exists(checkpoint_path_disc):
         load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
-    test_noise = torch.randn(config.batch_size, config.num_channels, config.noise_size, config.noise_size, device=config.device)
+    test_noise = torch.randn(16, config.num_channels, config.noise_size, config.noise_size, device=config.device)
     train(dataloader, generator, discriminator, test_noise, start_epoch=50, num_epochs=150)
     
