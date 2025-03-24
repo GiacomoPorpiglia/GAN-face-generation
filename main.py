@@ -98,10 +98,12 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             loss_disc.backward(retain_graph = True) ### retain_graph=True is to keep "fake" in the memory, because
                                                     ### we'll use it later for the generator
             opt_discriminator.step()
+            for p in discriminator.parameters():
+                p.data.clamp_(-0.01, 0.01)  # Clip weights to enforce Lipschitz constraint
 
             ### generator loss
             output = discriminator(fake)
-            loss_gen = criterion(output, torch.ones_like(output))
+            loss_gen = -torch.mean(output) # criterion(output, torch.ones_like(output))
 
             generator.zero_grad()
             loss_gen.backward()
