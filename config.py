@@ -3,8 +3,7 @@ import torch
 batch_size = 32
 noise_size = 8
 num_channels = 3
-output_size = 64
-input_size = 64
+image_size = 128
 lr = 2e-4
 
 size = 'big'

@@ -5,9 +5,9 @@ import torch.nn.functional as F
 
 
 class Generator(nn.Module):
-    def __init__(self, size='small'):
+    def __init__(self, size='small', image_size = 64):
         super(Generator, self).__init__()
-
+        self.initial_size = image_size // 16
         if size == 'small':
             self.expansion = 128
             self.reduction1 = 64
@@ -24,47 +24,54 @@ class Generator(nn.Module):
             self.reduction2 = 64
             self.reduction3 = 32
 
-        self.generate = nn.Sequential(
+        self.layers = nn.Sequential(
             nn.Flatten(start_dim=1),
-            nn.Linear(3*8*8, self.expansion * 8 * 8),
-            nn.ReLU(),
-            nn.Unflatten(1, (self.expansion, 8, 8)), # [B, expansion, 8, 8]
+            nn.Linear(3*8*8, self.expansion * self.initial_size * self.initial_size),
+            nn.ReLU(inplace=True),
+            nn.Unflatten(1, (self.expansion, self.initial_size, self.initial_size)), # [B, expansion, initial_size, initial_size]
 
-            nn.Upsample(scale_factor=2), # [B, expansion, 16, 16]
-            nn.Conv2d(self.expansion, self.expansion, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
+            nn.ConvTranspose2d(self.expansion, self.expansion, kernel_size=4, stride=2, padding=1, bias=False),
+            nn.BatchNorm2d(self.expansion),
+            nn.ReLU(inplace=True),
 
-            nn.Upsample(scale_factor=2), # [B, reduction1, 32, 32]
-            nn.Conv2d(self.expansion, self.reduction1, kernel_size=3, stride=1, padding=1),
+            # nn.Upsample(scale_factor=2), # [B, reduction1, 4*initial_size, 4*initial_size]
+            # nn.Conv2d(self.expansion, self.reduction1, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(self.expansion, self.reduction1, kernel_size=4, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(self.reduction1),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
 
-            nn.Upsample(scale_factor=2), # [B, reduction2, 64, 64]
-            nn.Conv2d(self.reduction1, self.reduction2, kernel_size=3, stride=1, padding=1),
+            # nn.Upsample(scale_factor=2), # [B, reduction2, image_size, image_size]
+            # nn.Conv2d(self.reduction1, self.reduction2, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(self.reduction1, self.reduction2, kernel_size=4, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(self.reduction2),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
 
-            nn.Conv2d(self.reduction2, self.reduction3, kernel_size=3, stride=1, padding=1), # [B, reduction3, 64, 64]
+            nn.ConvTranspose2d(self.reduction2, self.reduction3, kernel_size=4, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(self.reduction3),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
 
-            nn.Conv2d(self.reduction3, 3, kernel_size=3, padding=1),
+            nn.ConvTranspose2d(self.reduction3, 3, kernel_size=3, stride=1, padding=1, bias=False),
             nn.Tanh()
         )
 
 
     def forward(self, z):
         # z: [B, 3, 8, 8]
-        x = self.generate(z)
-        return x
+
+        for l in self.layers:
+            z = l(z)
+            print(z.shape)
+
+        # x = self.layers(z)
+        return z
 
 
 
 class Discriminator(nn.Module):
-    def __init__(self, size='small'):
+    def __init__(self, size='small', image_size=64):
         super(Discriminator, self).__init__()
 
+        self.image_size = image_size
         if size == 'small':
             self.expansion1 = 48
             self.expansion2 = 32
@@ -83,22 +90,22 @@ class Discriminator(nn.Module):
 
 
         self.discriminate = nn.Sequential(
-            nn.Conv2d(3, self.expansion1, kernel_size=3, stride=1, padding=1), # [B, expansion1, 64, 64]
-            nn.MaxPool2d(kernel_size=2),  # [B, expansion1, 32, 32]
+            nn.Conv2d(3, self.expansion1, kernel_size=3, stride=1, padding=1), # [B, expansion1, image_size, image_size]
+            nn.MaxPool2d(kernel_size=2),  # [B, expansion1, image_size/2, image_size/2]
             nn.LeakyReLU(inplace=True),
 
-            nn.Conv2d(self.expansion1, self.expansion2, kernel_size=3, stride=1, padding=1),  # [B, expansion2, 32, 32]
-            nn.MaxPool2d(kernel_size=2),  # [B, expansion2, 16, 16]
+            nn.Conv2d(self.expansion1, self.expansion2, kernel_size=3, stride=1, padding=1),  # [B, expansion2, image_size/2, image_size/2]
+            nn.MaxPool2d(kernel_size=2),  # [B, expansion2, image_size/4, image_size/4]
             nn.LeakyReLU(inplace=True),
 
-            nn.Conv2d(self.expansion2, self.expansion3, kernel_size=3, stride=1, padding=1),  # [B, expansion3, 32, 32]
-            nn.MaxPool2d(kernel_size=2),  # [B, expansion3, 8, 8]
+            nn.Conv2d(self.expansion2, self.expansion3, kernel_size=3, stride=1, padding=1),  # [B, expansion3, image_size/4, image_size/4]
+            nn.MaxPool2d(kernel_size=2),  # [B, expansion3, image_size/8, image_size/8]
             nn.LeakyReLU(inplace=True),
 
-            nn.Flatten(start_dim=1), # [B, expansion3 * 8 * 8]
-            nn.Linear(self.expansion3 * 8 * 8, self.expansion4 * 8 * 8),
+            nn.Flatten(start_dim=1), # [B, expansion3 * image_size * image_size / 64]
+            nn.Linear(self.expansion3 * self.image_size * self.image_size // 64, self.expansion4 * self.image_size * self.image_size // 64),
             nn.LeakyReLU(inplace=True),
-            nn.Linear(self.expansion4 * 8 * 8, 1),
+            nn.Linear(self.expansion4 * self.image_size * self.image_size // 64, 1),
             nn.Sigmoid()
         )
     

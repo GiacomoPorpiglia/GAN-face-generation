@@ -42,7 +42,7 @@ def load_checkpoint(model, optimizer, checkpoint):
 
 
 transform = transforms.Compose([
-    transforms.Resize((config.input_size, config.input_size)),  # Resize images to 64x64
+    transforms.Resize((config.image_size, config.image_size)),  # Resize images
     transforms.ToTensor(),        # Convert to tensor
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.Normalize((0.5,), (0.5,))  # Normalize to [-1, 1]
@@ -52,8 +52,9 @@ folder_path = "faces/Humans/"
 imgDataset = ImageFolderDataset(folder_path, transform=transform)
 dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, num_workers=12, persistent_workers=True, pin_memory=True)
 
-generator = Generator('small').to(config.device)
-discriminator = Discriminator('small').to(config.device)
+generator = Generator('small', config.image_size).to(config.device)
+
+discriminator = Discriminator('small', config.image_size).to(config.device)
 
 opt_generator = optim.Adam(generator.parameters(), lr=config.lr)
 opt_discriminator = optim.Adam(discriminator.parameters(), lr=config.lr)
