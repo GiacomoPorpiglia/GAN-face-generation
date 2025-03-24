@@ -61,12 +61,6 @@ opt_discriminator = optim.Adam(discriminator.parameters(), lr=config.lr)
 
 criterion = nn.BCELoss()
 
-def wasserstein_loss_real(fake_scores):
-    return -torch.mean(fake_scores)
-
-def wasserstein_loss_fake(real_scores):
-    return torch.mean(real_scores)
-
 
 
 def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num_epochs=20):
@@ -87,10 +81,10 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             ### discriminator loss
 
             disc_real = discriminator(real)
-            loss_disc_real = wasserstein_loss_real(disc_real) # criterion(disc_real, torch.ones_like(disc_real))
+            loss_disc_real = criterion(disc_real, torch.ones_like(disc_real))
 
             disc_fake = discriminator(fake)
-            loss_disc_fake = wasserstein_loss_fake(disc_fake) # criterion(disc_fake, torch.zeros_like(disc_fake))
+            loss_disc_fake = criterion(disc_fake, torch.zeros_like(disc_fake))
 
             loss_disc = (loss_disc_real + loss_disc_fake) / 2
 
@@ -98,12 +92,10 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             loss_disc.backward(retain_graph = True) ### retain_graph=True is to keep "fake" in the memory, because
                                                     ### we'll use it later for the generator
             opt_discriminator.step()
-            for p in discriminator.parameters():
-                p.data.clamp_(-0.01, 0.01)  # Clip weights to enforce Lipschitz constraint
 
             ### generator loss
             output = discriminator(fake)
-            loss_gen = -torch.mean(output) # criterion(output, torch.ones_like(output))
+            loss_gen = criterion(output, torch.ones_like(output))
 
             generator.zero_grad()
             loss_gen.backward()
@@ -157,5 +149,5 @@ if __name__ == "__main__":
     if os.path.exists(checkpoint_path_disc):
         load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
     test_noise = torch.randn(16, config.num_channels, config.noise_size, config.noise_size, device=config.device)
-    train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=150)
+    train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=500)
     
