@@ -57,13 +57,7 @@ class Generator(nn.Module):
 
     def forward(self, z):
         # z: [B, 3, 8, 8]
-
-        for l in self.layers:
-            z = l(z)
-            print(z.shape)
-
-        # x = self.layers(z)
-        return z
+        return self.layers(z)
 
 
 
@@ -106,7 +100,6 @@ class Discriminator(nn.Module):
             nn.Linear(self.expansion3 * self.image_size * self.image_size // 64, self.expansion4 * self.image_size * self.image_size // 64),
             nn.LeakyReLU(inplace=True),
             nn.Linear(self.expansion4 * self.image_size * self.image_size // 64, 1),
-            nn.Sigmoid()
         )
     
     def forward(self, x):
