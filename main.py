@@ -56,9 +56,17 @@ transform = transforms.Compose([
 ])
 
 
-rec_file = "CASIA-webface/train.rec"
-imgDataset = RecordDataset(rec_file, transform=transform)
-dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, num_workers=12, persistent_workers=True, pin_memory=True)
+rec_file = "casia-webface/train.rec"
+idx_file = "casia-webface/train.idx"
+imgDataset = RecordDataset(rec_file, idx_file, transform=transform)
+def collate_fn(batch):
+    batch = [b for b in batch if b is not None]  # Remove None values
+    return torch.utils.data.default_collate(batch) if batch else None
+
+dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
+#for batch_idx, data in enumerate(dataloader):
+ #   print(f"Batch {batch_idx}: {data}")  # This will trigger your print statements
+
 
 generator = Generator('small', config.image_size).to(config.device)
 generator.apply(init_weights)
@@ -74,7 +82,7 @@ criterion = nn.BCELoss()
 
 
 def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num_epochs=20):
-
+    total_batches = 0
     for epoch in range(start_epoch, num_epochs):
         generator.train()
         discriminator.train()
@@ -116,10 +124,11 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             last_loss_gen += loss_gen.item()
             last_loss_disc += loss_disc.item()
             batch_cnt += 1
+            total_batches+=1
 
 
-        
-        save_generated_image(generator, epoch+1, test_noise)
+            if(total_batches%2000==0):
+                save_generated_image(generator, total_batches//2000, test_noise)
 
 
         print("Loss gen: ", last_loss_gen/(batch_cnt*config.batch_size))
@@ -146,7 +155,7 @@ def save_generated_image(generator, epoch, fixed_noise, save_dir="generated_imag
     fake_image = (fake_image + 1) / 2  # Normalize to [0,1]
 
     # Save image grid
-    filename = f"{save_dir}/epoch_{epoch}.png"
+    filename = f"{save_dir}/step_{epoch}.png"
     vutils.save_image(fake_image, filename, normalize=True, nrow=4)
     print(f"Saved image: {filename}")
 
