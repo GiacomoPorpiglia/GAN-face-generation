@@ -118,7 +118,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
 
             real = real.to(config.device, non_blocking=True)
 
-            input_noise = torch.randn(config.batch_size, config.noise_size, 1, 1, device=config.device)
+            input_noise = torch.randn(real.shape[0], config.noise_size, 1, 1, device=config.device)
             fake = generator(input_noise)
 
             ### discriminator loss
@@ -152,7 +152,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             total_batches+=1
 
 
-            if(total_batches%2000==0):
+            if(total_batches%1000==0):
                 save_generated_image(generator, total_batches//2000, test_noise)
 
 

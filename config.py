@@ -1,6 +1,6 @@
 import torch
 
-batch_size = 32
+batch_size = 64
 noise_size = 128
 num_channels = 3
 image_size = 128

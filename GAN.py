@@ -61,7 +61,6 @@ class Discriminator(nn.Module):
             self._block(self.features*4, self.features*8, 4, 2, 1), # [B, features*8, 8, 8]
             self._block(self.features*8, self.features*16, 4, 2, 1), # [B, features*16, 4, 4]
             nn.Conv2d(self.features*16, 1, kernel_size=4, stride=2, padding=0), # [B, 1, 1, 1]
-            nn.Sigmoid()
 
         )
 
