@@ -13,7 +13,7 @@ def display_image_sequence(folder_path, delay=1):
     folder_path (str): Path to the folder containing images.
     delay (int): Time (in seconds) between displaying images.
     """
-    image_files = sorted(glob.glob(os.path.join(folder_path, "epoch_*.png")), 
+    image_files = sorted(glob.glob(os.path.join(folder_path, "step_*.png")), 
                          key=lambda x: int(os.path.basename(x).split("_")[1].split(".")[0]))
     
     if not image_files:
