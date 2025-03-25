@@ -81,6 +81,31 @@ criterion = nn.BCELoss()
 
 
 
+
+
+def compute_gradient_penalty(discriminator, real_samples, fake_samples, device):
+    """Calculates the gradient penalty for WGAN-GP"""
+    alpha = torch.rand(real_samples.size(0), 1, 1, 1, device=device)  # Random weight for interpolation
+    interpolated = (alpha * real_samples + (1 - alpha) * fake_samples).requires_grad_(True)
+
+    d_interpolated = discriminator(interpolated)
+
+    gradients = torch.autograd.grad(
+        outputs=d_interpolated, inputs=interpolated,
+        grad_outputs=torch.ones_like(d_interpolated),  # Create same shape tensor for gradients
+        create_graph=True, retain_graph=True, only_inputs=True
+    )[0]
+
+    gradients = gradients.view(gradients.shape[0], -1)  # Flatten gradients
+    gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean()  # Enforce ||grad|| = 1
+
+    return gradient_penalty
+
+
+
+
+
+
 def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num_epochs=20):
     total_batches = 0
     for epoch in range(start_epoch, num_epochs):
@@ -99,12 +124,12 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             ### discriminator loss
 
             disc_real = discriminator(real)
-            loss_disc_real = criterion(disc_real, torch.ones_like(disc_real))
-
             disc_fake = discriminator(fake)
-            loss_disc_fake = criterion(disc_fake, torch.zeros_like(disc_fake))
+            wasserstein_loss = torch.mean(disc_fake) - torch.mean(disc_real)  # WGAN loss
 
-            loss_disc = (loss_disc_real + loss_disc_fake) / 2
+            gradient_penalty = compute_gradient_penalty(discriminator, real, fake, config.device)
+            # Add gradient penalty
+            loss_disc += wasserstein_loss + config.lambda_gp * gradient_penalty
 
             discriminator.zero_grad()
             loss_disc.backward(retain_graph = True) ### retain_graph=True is to keep "fake" in the memory, because
@@ -113,7 +138,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
 
             ### generator loss
             output = discriminator(fake)
-            loss_gen = criterion(output, torch.ones_like(output))
+            loss_gen = -torch.mean(output)
 
             generator.zero_grad()
             loss_gen.backward()
