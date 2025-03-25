@@ -7,7 +7,7 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from dataset import ImageFolderDataset
+from dataset import ImageFolderDataset, RecordDataset, ZipImageDataset
 import config
 from GAN import Generator, Discriminator
 from tqdm import tqdm
@@ -55,8 +55,9 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,), (0.5,))  # Normalize to [-1, 1]
 ])
 
-folder_path = "faces/Humans/"
-imgDataset = ImageFolderDataset(folder_path, transform=transform)
+
+rec_file = "CASIA-webface/train.rec"
+imgDataset = RecordDataset(rec_file, transform=transform)
 dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, num_workers=12, persistent_workers=True, pin_memory=True)
 
 generator = Generator('small', config.image_size).to(config.device)
