@@ -153,22 +153,22 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
 
 
             if(total_batches%1000==0):
-                save_generated_image(generator, total_batches//2000, test_noise)
+                save_generated_image(generator, total_batches//1000, test_noise)
 
 
-        print("Loss gen: ", last_loss_gen/(batch_cnt*config.batch_size))
-        print("Loss disc: ", last_loss_disc/(batch_cnt*config.batch_size))
-
-        checkpoint_gen = {
-            'state_dict': generator.state_dict(),
-            'optimizer': opt_generator.state_dict()
-        }
-        checkpoint_disc = {
-            'state_dict': discriminator.state_dict(),
-            'optimizer': opt_discriminator.state_dict()
-        }
-        save_checkpoint(checkpoint_gen, checkpoint_path_gen)    
-        save_checkpoint(checkpoint_disc, checkpoint_path_disc)
+                print("Loss gen: ", last_loss_gen/(batch_cnt*config.batch_size))
+                print("Loss disc: ", last_loss_disc/(batch_cnt*config.batch_size))
+        
+                checkpoint_gen = {
+                    'state_dict': generator.state_dict(),
+                    'optimizer': opt_generator.state_dict()
+                }
+                checkpoint_disc = {
+                    'state_dict': discriminator.state_dict(),
+                    'optimizer': opt_discriminator.state_dict()
+                }
+                save_checkpoint(checkpoint_gen, checkpoint_path_gen)    
+                save_checkpoint(checkpoint_disc, checkpoint_path_disc)
 
 
 def save_generated_image(generator, epoch, fixed_noise, save_dir="generated_images"):
