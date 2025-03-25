@@ -129,7 +129,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
 
             gradient_penalty = compute_gradient_penalty(discriminator, real, fake, config.device)
             # Add gradient penalty
-            loss_disc += wasserstein_loss + config.lambda_gp * gradient_penalty
+            loss_disc = wasserstein_loss + config.lambda_gp * gradient_penalty
 
             discriminator.zero_grad()
             loss_disc.backward(retain_graph = True) ### retain_graph=True is to keep "fake" in the memory, because
