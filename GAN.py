@@ -16,11 +16,12 @@ class Generator(nn.Module):
             self.features = 48
 
         self.generate = nn.Sequential(
-            self._block(config.noise_size, self.features*16, 4, 1, 0), # [B, features*16, 4, 4]
-            self._block(self.features*16, self.features*8, 4, 2, 1), # [B, features*8, 8, 8]
-            self._block(self.features*8, self.features*4, 4, 2, 1), # [B, features*4, 16, 16]
-            self._block(self.features*4, self.features*2, 4, 2, 1), # [B, features*2, 32, 32]
-            nn.ConvTranspose2d(self.features*2, 3, kernel_size=4, stride=2, padding=1), # [B, 3, 64, 64]
+            self._block(config.noise_size, self.features*32, 4, 1, 0), # [B, features*16, 4, 4]
+            self._block(self.features*32, self.features*16, 4, 2, 1), # [B, features*8, 8, 8]
+            self._block(self.features*16, self.features*8, 4, 2, 1), # [B, features*4, 16, 16]
+            self._block(self.features*8, self.features*4, 4, 2, 1), # [B, features*2, 32, 32]
+            self._block(self.features*4, self.features*2, 4, 2, 1), # [B, features*2, 64, 64]
+            nn.ConvTranspose2d(self.features*2, 3, kernel_size=4, stride=2, padding=1), # [B, 3, 128, 128]
             nn.Tanh()
         )
 
@@ -35,7 +36,7 @@ class Generator(nn.Module):
 
     def forward(self, z):
         # z: [B, 3, 8, 8]
-        return self.generate(z)
+        return self.generate(z) # [B, 3, 128, 128]
 
 
 class Discriminator(nn.Module):

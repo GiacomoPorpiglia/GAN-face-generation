@@ -65,8 +65,8 @@ generator.apply(init_weights)
 discriminator = Discriminator('small', config.image_size).to(config.device)
 discriminator.apply(init_weights)
 
-opt_generator = optim.Adam(generator.parameters(), lr=config.lr)
-opt_discriminator = optim.Adam(discriminator.parameters(), lr=config.lr)
+opt_generator = optim.Adam(generator.parameters(), lr=config.lr, betas=(0.5, 0.999))
+opt_discriminator = optim.Adam(discriminator.parameters(), lr=config.lr, betas=(0.5, 0.999))
 
 criterion = nn.BCELoss()
 
@@ -157,6 +157,6 @@ if __name__ == "__main__":
         
     if os.path.exists(checkpoint_path_disc):
         load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
-    test_noise = torch.randn(16, config.num_channels, config.noise_size, config.noise_size, device=config.device)
+    test_noise = torch.randn(16, config.noise_size, 1, 1, device=config.device)
     train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=500)
     
