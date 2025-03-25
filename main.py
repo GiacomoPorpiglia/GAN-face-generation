@@ -38,6 +38,13 @@ def load_checkpoint(model, optimizer, checkpoint):
         print("\tX => Something went wrong in loading the checkpoint")
 
 
+def init_weights(m):
+    if isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+        nn.init.normal_(m.weight, mean=0.0, std=0.02)
+        if m.bias is not None:
+            nn.init.zeros_(m.bias)
+
+
 ### ---------------------------------------------------------------
 
 
@@ -53,8 +60,10 @@ imgDataset = ImageFolderDataset(folder_path, transform=transform)
 dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, num_workers=12, persistent_workers=True, pin_memory=True)
 
 generator = Generator('small', config.image_size).to(config.device)
+generator.apply(init_weights)
 
 discriminator = Discriminator('small', config.image_size).to(config.device)
+discriminator.apply(init_weights)
 
 opt_generator = optim.Adam(generator.parameters(), lr=config.lr)
 opt_discriminator = optim.Adam(discriminator.parameters(), lr=config.lr)
@@ -75,7 +84,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
 
             real = real.to(config.device, non_blocking=True)
 
-            input_noise = torch.randn(config.batch_size, config.num_channels, config.noise_size, config.noise_size, device=config.device)
+            input_noise = torch.randn(config.batch_size, config.noise_size, 1, 1, device=config.device)
             fake = generator(input_noise)
 
             ### discriminator loss
