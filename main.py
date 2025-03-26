@@ -68,10 +68,10 @@ dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, 
  #   print(f"Batch {batch_idx}: {data}")  # This will trigger your print statements
 
 
-generator = Generator('big', config.image_size).to(config.device)
+generator = Generator(config.size, config.image_size).to(config.device)
 generator.apply(init_weights)
 
-discriminator = Discriminator('big', config.image_size).to(config.device)
+discriminator = Discriminator(config.size, config.image_size).to(config.device)
 discriminator.apply(init_weights)
 
 opt_generator = optim.Adam(generator.parameters(), lr=config.lr, betas=(0.5, 0.999))
@@ -121,11 +121,11 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             input_noise = torch.randn(real.shape[0], config.noise_size, 1, 1, device=config.device)
             fake = generator(input_noise)
 
-            ### discriminator loss
+            ### discriminator loss (WGAN-GP)
 
             disc_real = discriminator(real)
             disc_fake = discriminator(fake)
-            wasserstein_loss = torch.mean(disc_fake) - torch.mean(disc_real)  # WGAN loss
+            wasserstein_loss = torch.mean(disc_fake) - torch.mean(disc_real)  # WGAN-GP loss
 
             gradient_penalty = compute_gradient_penalty(discriminator, real, fake, config.device)
             # Add gradient penalty
