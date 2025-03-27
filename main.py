@@ -13,8 +13,12 @@ from GAN import Generator, Discriminator
 from tqdm import tqdm
 import torchvision.utils as vutils
 
-checkpoint_path_gen = "./checkpoint_gen.pth.tar"
-checkpoint_path_disc = "./checkpoint_disc.pth.tar"
+
+args = config.get_args()
+
+
+checkpoint_path_gen = args.gen_path
+checkpoint_path_disc = args.disc_path
 
 print(config.device)
 
@@ -63,19 +67,19 @@ def collate_fn(batch):
     batch = [b for b in batch if b is not None]  # Remove None values
     return torch.utils.data.default_collate(batch) if batch else None
 
-dataloader = DataLoader(imgDataset, batch_size=config.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
+dataloader = DataLoader(imgDataset, batch_size=args.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
 #for batch_idx, data in enumerate(dataloader):
  #   print(f"Batch {batch_idx}: {data}")  # This will trigger your print statements
 
 
-generator = Generator(config.size, config.image_size).to(config.device)
+generator = Generator(args.model_size).to(config.device)
 generator.apply(init_weights)
 
-discriminator = Discriminator(config.size, config.image_size).to(config.device)
+discriminator = Discriminator(args.model_size).to(config.device)
 discriminator.apply(init_weights)
 
-opt_generator = optim.Adam(generator.parameters(), lr=config.lr, betas=(0.5, 0.999))
-opt_discriminator = optim.Adam(discriminator.parameters(), lr=config.lr, betas=(0.5, 0.999))
+opt_generator = optim.Adam(generator.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
+opt_discriminator = optim.Adam(discriminator.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
 
 criterion = nn.BCELoss()
 
@@ -156,8 +160,8 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
                 save_generated_image(generator, total_batches//1000, test_noise)
 
 
-                print("Loss gen: ", last_loss_gen/(batch_cnt*config.batch_size))
-                print("Loss disc: ", last_loss_disc/(batch_cnt*config.batch_size))
+                print("Loss gen: ", last_loss_gen/(batch_cnt*args.batch_size))
+                print("Loss disc: ", last_loss_disc/(batch_cnt*args.batch_size))
         
                 checkpoint_gen = {
                     'state_dict': generator.state_dict(),
@@ -186,12 +190,19 @@ def save_generated_image(generator, epoch, fixed_noise, save_dir="generated_imag
 
 
 if __name__ == "__main__":
-  
+    
     if os.path.exists(checkpoint_path_gen):
         load_checkpoint(generator, opt_generator, torch.load(checkpoint_path_gen))
         
     if os.path.exists(checkpoint_path_disc):
         load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
-    test_noise = torch.randn(16, config.noise_size, 1, 1, device=config.device)
-    train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=500)
+
+    if args.mode == 'train':
+        test_noise = torch.randn(16, config.noise_size, 1, 1, device=config.device)
+        train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=args.num_epochs)
+    elif args.mode == 'generate':
+        pass
+
+    
+    
     

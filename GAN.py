@@ -4,15 +4,14 @@ import torch.nn.functional as F
 import config
 
 
-
 class Generator(nn.Module):
-    def __init__(self, size='small', image_size = 128):
+    def __init__(self, model_size):
         super(Generator, self).__init__()
-        if size == 'small':
+        if model_size == 'small':
             self.features = 24
-        elif size == 'medium':
+        elif model_size == 'medium':
             self.features = 32
-        elif size == 'big':
+        elif model_size == 'big':
             self.features = 48
 
         self.generate = nn.Sequential(
@@ -40,15 +39,14 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, size='small', image_size=128):
+    def __init__(self, model_size):
         super(Discriminator, self).__init__()
 
-        self.image_size = image_size
-        if size == 'small':
+        if model_size == 'small':
             self.features = 24
-        elif size == 'medium':
+        elif model_size == 'medium':
             self.features = 32
-        elif size == 'big':
+        elif model_size == 'big':
             self.features = 48
 
         self.discriminate = nn.Sequential(
