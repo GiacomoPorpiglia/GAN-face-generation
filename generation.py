@@ -7,8 +7,11 @@ def generate(generator, save_dir="generated_images", num_images=10):
     generator.eval()
 
     with torch.no_grad():
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
 
         for i in range(num_images):
+
             
             noise = torch.randn(1, config.noise_size, 1, 1, device=config.device)
             image = generator(noise).cpu()

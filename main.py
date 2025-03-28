@@ -68,9 +68,6 @@ def collate_fn(batch):
     return torch.utils.data.default_collate(batch) if batch else None
 
 dataloader = DataLoader(imgDataset, batch_size=args.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
-#for batch_idx, data in enumerate(dataloader):
- #   print(f"Batch {batch_idx}: {data}")  # This will trigger your print statements
-
 
 generator = Generator(args.model_size).to(config.device)
 generator.apply(init_weights)
@@ -176,6 +173,10 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
 
 
 def save_training_generation_image(generator, epoch, fixed_noise, save_dir="training_gen_results"):
+
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
     generator.eval()  # Set generator to evaluation mode
     with torch.no_grad():
         fake_image = generator(fixed_noise).cpu()  # Generate image from noise
