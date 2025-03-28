@@ -62,12 +62,12 @@ transform = transforms.Compose([
 
 rec_file = "casia-webface/train.rec"
 idx_file = "casia-webface/train.idx"
-imgDataset = RecordDataset(rec_file, idx_file, transform=transform)
+# imgDataset = RecordDataset(rec_file, idx_file, transform=transform)
 def collate_fn(batch):
     batch = [b for b in batch if b is not None]  # Remove None values
     return torch.utils.data.default_collate(batch) if batch else None
 
-dataloader = DataLoader(imgDataset, batch_size=args.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
+# dataloader = DataLoader(imgDataset, batch_size=args.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
 
 generator = Generator(args.model_size).to(config.device)
 generator.apply(init_weights)

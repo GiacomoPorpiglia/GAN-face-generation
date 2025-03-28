@@ -1,10 +1,7 @@
 *.zip
 generated_images
+training_gen_results
 __pycache__
 key
-interpolation_animation
-*.jpg
-*.png
-*.jpeg
 key
 *.tar
