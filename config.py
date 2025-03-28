@@ -16,6 +16,8 @@ def get_args():
 
     parser.add_argument("-model_size", type=str, default="big", required=True, help="Size of the model: 'small', 'medium' or 'big'")
 
+    parser.add_argument("-num_images", type=int, default=10, help="Number of images to generate. (only applicable in generate mode)")
+
     args = parser.parse_args()
     
     if args.mode == "train":

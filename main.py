@@ -12,7 +12,7 @@ import config
 from GAN import Generator, Discriminator
 from tqdm import tqdm
 import torchvision.utils as vutils
-
+from generation import *
 
 args = config.get_args()
 
@@ -157,7 +157,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
 
 
             if(total_batches%1000==0):
-                save_generated_image(generator, total_batches//1000, test_noise)
+                save_training_generation_image(generator, total_batches//1000, test_noise)
 
 
                 print("Loss gen: ", last_loss_gen/(batch_cnt*args.batch_size))
@@ -175,7 +175,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
                 save_checkpoint(checkpoint_disc, checkpoint_path_disc)
 
 
-def save_generated_image(generator, epoch, fixed_noise, save_dir="generated_images"):
+def save_training_generation_image(generator, epoch, fixed_noise, save_dir="training_gen_results"):
     generator.eval()  # Set generator to evaluation mode
     with torch.no_grad():
         fake_image = generator(fixed_noise).cpu()  # Generate image from noise
@@ -189,6 +189,8 @@ def save_generated_image(generator, epoch, fixed_noise, save_dir="generated_imag
     print(f"Saved image: {filename}")
 
 
+
+
 if __name__ == "__main__":
     
     if os.path.exists(checkpoint_path_gen):
@@ -200,8 +202,9 @@ if __name__ == "__main__":
     if args.mode == 'train':
         test_noise = torch.randn(16, config.noise_size, 1, 1, device=config.device)
         train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=args.num_epochs)
+
     elif args.mode == 'generate':
-        pass
+        generate(generator, save_dir="generated_images", num_images=args.num_images)
 
     
     
