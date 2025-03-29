@@ -3,7 +3,7 @@ import argparse
 
 def get_args():
     parser = argparse.ArgumentParser(description="Argument parser for training and evaluation modes")
-    parser.add_argument("-mode", type=str, choices=["train", "generate"], required=True, help="Mode of operation: 'train' or 'generate'")
+    parser.add_argument("-mode", type=str, choices=["train", "generate", "interpolate"], required=True, help="Mode of operation: 'train', 'generate' or 'interpolate'")
     
     # Additional arguments for training mode
     parser.add_argument("-num_epochs", type=int, default=10, help="Number of epochs for training (only applicable in train mode)")

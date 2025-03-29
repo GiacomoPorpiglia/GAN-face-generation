@@ -28,6 +28,13 @@ To generate images with a trained generator model:
 ```
 python main.py -mode generate -model_size big -gen_path ./checkpioint_gen.pth.tar
 ```
+To generate a video of an interpolation between two images:
+```
+python main.py -mode interpolate -model_size big -gen_path ./checkpioint_gen.pth.tar
+```
+An example of interpolation video is the following:</br>
+![Interpolation video](imgs/interpolation_result.gif)
+
 For the full list of available options, just run 
 ```
 python main.py --help

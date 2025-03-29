@@ -7,7 +7,7 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from dataset import ImageFolderDataset, RecordDataset, ZipImageDataset
+from dataset import RecordDataset
 import config
 from GAN import Generator, Discriminator
 from tqdm import tqdm
@@ -210,6 +210,10 @@ if __name__ == "__main__":
     elif args.mode == 'generate':
         generate(generator, save_dir="generated_images", num_images=args.num_images)
 
+    elif args.mode == 'interpolate':
+        noise1 = torch.randn(1, config.noise_size, 1, 1, device=config.device)
+        noise2 = torch.randn(1, config.noise_size, 1, 1, device=config.device)
+        interpolate(generator, noise1, noise2)
     
     
     

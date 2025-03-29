@@ -1,6 +1,7 @@
 *.zip
 generated_images
 training_gen_results
+interpolated_images
 __pycache__
 key
 key
