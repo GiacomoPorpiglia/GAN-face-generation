@@ -31,10 +31,8 @@ class Generator(nn.Module):
             nn.ReLU(inplace=True)
         )
 
-
-
     def forward(self, z):
-        # z: [B, 3, 8, 8]
+        # z: [B, 128, 1, 1]
         return self.generate(z) # [B, 3, 128, 128]
 
 
@@ -73,4 +71,4 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         x = self.discriminate(x)
-        return x # [B, 1]
+        return x # [B, 1, 1, 1]
