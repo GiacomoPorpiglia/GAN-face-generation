@@ -24,9 +24,9 @@ Train:
 ```
 python main.py -mode train -model_size big -num_epochs 50 -gen_path ./checkpioint_gen.pth.tar -disc_path ./checkpoint_disc.pth.tar
 ```
-Generate images with a trained generator model:
+To generate images with a trained generator model:
 ```
-python main.py -mode generate -model_size big -gen_path ./checkpioint_gen.pth.tar -disc_path 
+python main.py -mode generate -model_size big -gen_path ./checkpioint_gen.pth.tar
 ```
 For the full list of available options, just run 
 ```
