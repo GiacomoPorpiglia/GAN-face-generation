@@ -19,8 +19,8 @@ Here are the results of generation after training:</br></br>
 If you wish to use this repo for training your own version of the model or just to generate faces with the existing model versions included in the repo, you can easily do it.</br>
 You can also train models with different sizes (small, medium or big).</br>
 To train a new model, you first need to download the casia-webface dataset, which I downloaded from [here](https://www.kaggle.com/datasets/debarghamitraroy/casia-webface), and unzip the folder.</br>
-Reading the binary file that contains the dataset makes use of the mxnet Python library, which from my experience works only on Linux machines, and with numpy 1.23.5.
-Train:
+Reading the binary file that contains the dataset makes use of the mxnet Python library, which from my experience works only on Linux machines, and with numpy 1.23.5.</br>
+To train a model:
 ```
 python main.py -mode train -model_size big -num_epochs 50 -gen_path ./checkpioint_gen.pth.tar -disc_path ./checkpoint_disc.pth.tar
 ```

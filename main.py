@@ -83,9 +83,10 @@ criterion = nn.BCELoss()
 
 
 
-
+"""
+    Calculates the gradient penalty for WGAN-GP
+"""
 def compute_gradient_penalty(discriminator, real_samples, fake_samples, device):
-    """Calculates the gradient penalty for WGAN-GP"""
     alpha = torch.rand(real_samples.size(0), 1, 1, 1, device=device)  # Random weight for interpolation
     interpolated = (alpha * real_samples + (1 - alpha) * fake_samples).requires_grad_(True)
 
@@ -108,6 +109,7 @@ def compute_gradient_penalty(discriminator, real_samples, fake_samples, device):
 
 
 def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num_epochs=20):
+
     total_batches = 0
     for epoch in range(start_epoch, num_epochs):
         generator.train()
@@ -153,6 +155,7 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             total_batches+=1
 
 
+            ### generate new faces every 1000 batches to monitor the training
             if(total_batches%1000==0):
                 save_training_generation_image(generator, total_batches//1000, test_noise)
 
