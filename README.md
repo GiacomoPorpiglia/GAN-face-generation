@@ -37,7 +37,7 @@ An example of interpolation video is the following:</br>
 <div align="center">
 <img src="imgs/interpolation_start.png" width="256"/>
 <img src="imgs/interpolation_end.png" width="256"/>
- <video autoplay loop muted playsinline src="imgs/interpolation_result.mp4" width="256"></video> 
+<img src="imgs/interpolation_result.gif" width="256"></img> 
 </div>
 <br>
 
