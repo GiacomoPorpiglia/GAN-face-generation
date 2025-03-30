@@ -10,9 +10,10 @@ The architecture of Generator and Discriminator are inspired by the DCGAN paper 
 I trained the model for about 30 epochs on the Casia-webface dataset, containing about 500k images of human faces. The accuracy I obtained is not perfect, but it's enough to make me happy! With more training, the model can surely be improved. 
 
 # Results
-Here are the results of generation after training:</br></br>
-![Results](imgs/result.png)
-
+Here are the results of generation after training:<br><br>
+<div align="center">
+<img src="imgs/result.png" width="512"/>
+</div>
 
 # How to use
 
@@ -33,7 +34,12 @@ To generate a video of an interpolation between two images:
 python main.py -mode interpolate -model_size big -gen_path ./checkpioint_gen.pth.tar
 ```
 An example of interpolation video is the following:</br>
-![Interpolation video](imgs/interpolation_result.gif)
+<div align="center">
+<img src="imgs/interpolation_start.png" width="256"/>
+<img src="imgs/interpolation_end.png" width="256"/>
+ <video autoplay loop muted playsinline src="imgs/interpolation_result.mp4" width="256"></video> 
+</div>
+<br>
 
 For the full list of available options, just run 
 ```
