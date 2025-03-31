@@ -1,4 +1,9 @@
-# Face Generation with GAN
+<h1 align="center">Face Generation with DCGAN and WGAN-GP loss </h1>
+<div align="center">
+<img src="imgs/result.png" width="512"/>
+</div>
+<br><br>
+
 
 In this project I have implemented a Generative Adversarial Network for face generation, using WGAN-GP loss.
 The network was trained to generate 128x128 pixels images of human faces, inspired by the website [www.thispersondoesnotexist.com](https://www.thispersondoesnotexist.com).</br>
@@ -8,12 +13,6 @@ The architecture of Generator and Discriminator are inspired by the DCGAN paper 
 
 # Training
 I trained the model for about 30 epochs on the Casia-webface dataset, containing about 500k images of human faces. The accuracy I obtained is not perfect, but it's enough to make me happy! With more training, the model can surely be improved. 
-
-# Results
-Here are the results of generation after training:<br><br>
-<div align="center">
-<img src="imgs/result.png" width="512"/>
-</div>
 
 # How to use
 
