@@ -1,6 +1,5 @@
 import os
 import glob
-import time
 import matplotlib.pyplot as plt
 import cv2
 

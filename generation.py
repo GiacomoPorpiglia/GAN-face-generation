@@ -2,7 +2,6 @@ import torch
 import config
 import torchvision.utils as vutils
 import os
-import imageio.v2 as imageio
 import moviepy.video.io.ImageSequenceClip
 
 def generate(generator, save_dir="generated_images", num_images=10):
