@@ -78,9 +78,6 @@ discriminator.apply(init_weights)
 opt_generator = optim.Adam(generator.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
 opt_discriminator = optim.Adam(discriminator.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
 
-criterion = nn.BCELoss()
-
-
 
 
 """
