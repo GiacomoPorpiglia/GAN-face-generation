@@ -4,7 +4,6 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import os
-from dataset import RecordDataset
 import config
 from GAN import Generator, Discriminator
 from tqdm import tqdm
@@ -12,6 +11,11 @@ import torchvision.utils as vutils
 from generation import *
 
 args = config.get_args()
+if(args.mode == 'train'):
+    try:
+        from dataset import RecordDataset
+    except:
+        print("Module mxnet was not found. If you are using a Windows machine, it's likely that you will have trouble in using it. Please use a Linux machine if you want to train a new model.")
 
 
 checkpoint_path_gen = args.gen_path
@@ -59,12 +63,10 @@ transform = transforms.Compose([
 
 rec_file = "casia-webface/train.rec"
 idx_file = "casia-webface/train.idx"
-imgDataset = RecordDataset(rec_file, idx_file, transform=transform)
 def collate_fn(batch):
     batch = [b for b in batch if b is not None]  # Remove None values
     return torch.utils.data.default_collate(batch) if batch else None
 
-dataloader = DataLoader(imgDataset, batch_size=args.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
 
 generator = Generator(args.model_size).to(config.device)
 generator.apply(init_weights)
@@ -198,6 +200,10 @@ if __name__ == "__main__":
         load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
 
     if args.mode == 'train':
+        imgDataset = RecordDataset(rec_file, idx_file, transform=transform)
+ 
+        dataloader = DataLoader(imgDataset, batch_size=args.batch_size, shuffle=True, collate_fn = collate_fn, num_workers=8, persistent_workers=True, pin_memory=True)
+
         test_noise = torch.randn(16, config.noise_size, 1, 1, device=config.device)
         train(dataloader, generator, discriminator, test_noise, start_epoch=0, num_epochs=args.num_epochs)
 
