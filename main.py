@@ -23,24 +23,6 @@ checkpoint_path_disc = args.disc_path
 
 print(config.device)
 
-def save_checkpoint(checkpoint, filename):
-    print("=> saving checkpoint...")
-    try:
-        torch.save(checkpoint, filename)
-        print("\t=> checkpoint saved!")
-    except:
-        print("\tX => Something went wrong in saving the network")
-
-
-
-def load_checkpoint(model, optimizer, checkpoint):
-    print("=> loading checkpoint...")
-    try:
-        model.load_state_dict(checkpoint['state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-        print("\t=> checkpoint loaded!")
-    except:
-        print("\tX => Something went wrong in loading the checkpoint")
 
 
 def init_weights(m):
@@ -68,10 +50,10 @@ def collate_fn(batch):
     return torch.utils.data.default_collate(batch) if batch else None
 
 
-generator = Generator(args.model_size).to(config.device)
+generator = Generator(args.model_size)
 generator.apply(init_weights)
 
-discriminator = Discriminator(args.model_size).to(config.device)
+discriminator = Discriminator(args.model_size)
 discriminator.apply(init_weights)
 
 opt_generator = optim.Adam(generator.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
@@ -159,24 +141,15 @@ def train(dataloader, generator, discriminator, test_noise, start_epoch = 0, num
             total_batches+=1
 
 
-            ### generate new faces every 1000 batches to monitor the training
+            ### generate new faces every 1000 batches to monitor the training and save the model
             if(total_batches%1000==0):
                 save_training_generation_image(generator, total_batches//1000, test_noise)
-
 
                 print("Loss gen: ", last_loss_gen/(batch_cnt*args.batch_size))
                 print("Loss disc: ", last_loss_disc/(batch_cnt*args.batch_size))
         
-                checkpoint_gen = {
-                    'state_dict': generator.state_dict(),
-                    'optimizer': opt_generator.state_dict()
-                }
-                checkpoint_disc = {
-                    'state_dict': discriminator.state_dict(),
-                    'optimizer': opt_discriminator.state_dict()
-                }
-                save_checkpoint(checkpoint_gen, checkpoint_path_gen)    
-                save_checkpoint(checkpoint_disc, checkpoint_path_disc)
+                torch.save(generator.state_dict(), checkpoint_path_gen)
+                torch.save(discriminator.state_dict(), checkpoint_path_disc)
 
 
 def save_training_generation_image(generator, epoch, fixed_noise, save_dir="training_gen_results"):
@@ -200,12 +173,16 @@ def save_training_generation_image(generator, epoch, fixed_noise, save_dir="trai
 
 
 if __name__ == "__main__":
-    
+
     if os.path.exists(checkpoint_path_gen):
-        load_checkpoint(generator, opt_generator, torch.load(checkpoint_path_gen))
+        generator = generator.to("cpu")
+        generator.load_state_dict(torch.load(checkpoint_path_gen))
+        generator = generator.to(config.device)
         
     if os.path.exists(checkpoint_path_disc):
-        load_checkpoint(discriminator, opt_discriminator, torch.load(checkpoint_path_disc))
+        discriminator = discriminator.to("cpu")
+        discriminator.load_state_dict(torch.load(checkpoint_path_disc))
+        discriminator = discriminator.to(config.device)
 
     if args.mode == 'train':
         imgDataset = RecordDataset(rec_file, idx_file, transform=transform)
