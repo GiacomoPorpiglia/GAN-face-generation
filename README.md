@@ -22,15 +22,15 @@ To train a new model, you first need to download the casia-webface dataset, whic
 Reading the binary file that contains the dataset makes use of the mxnet Python library, which from my experience works only on Linux machines, and with numpy 1.23.5.</br>
 To train a model:
 ```
-python main.py -mode train -model_size big -num_epochs 50 -gen_path ./checkpoint_gen.pth.tar -disc_path ./checkpoint_disc.pth.tar
+python main.py -mode train -model_size big -num_epochs 50 -gen_path ./generator.pth -disc_path ./discriminator.pth
 ```
 To generate images with a trained generator model:
 ```
-python main.py -mode generate -model_size big -gen_path ./checkpoint_gen.pth.tar
+python main.py -mode generate -model_size big -gen_path ./generator.pth
 ```
 To generate a video of an interpolation between two images:
 ```
-python main.py -mode interpolate -model_size big -gen_path ./checkpoint_gen.pth.tar
+python main.py -mode interpolate -model_size big -gen_path ./generator.pth
 ```
 An example of interpolation video is the following:</br>
 <div align="center">
