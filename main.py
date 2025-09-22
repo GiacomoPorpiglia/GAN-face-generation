@@ -80,7 +80,15 @@ opt_discriminator = optim.Adam(discriminator.parameters(), lr=args.learning_rate
 
 
 """
-    Calculates the gradient penalty for WGAN-GP
+    Calculates the gradient penalty for WGAN-GP.
+    It calculates an interpolated batch as the interpolation between real
+    and fake samples with a random coefficient alpha.
+    Then, we feed this interpolated images to the discriminator,
+    and we calculate the gradients w.r.t. the input.
+    These gradients tell us: how much does the discriminator's output change,
+    by changing the input?
+    We want these gradients to have an expected norm of 1: this is made to stabilize the discriminator's prediction on a variety of possible inputs.
+    With this we enforce the Lipschitz constraint on the discriminator
 """
 def compute_gradient_penalty(discriminator, real_samples, fake_samples, device):
     alpha = torch.rand(real_samples.size(0), 1, 1, 1, device=device)  # Random weight for interpolation
